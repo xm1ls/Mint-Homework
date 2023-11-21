@@ -46,7 +46,7 @@ namespace DataBase.DataControllers
             {
                 connection.Open();
                 var rows = connection.Execute(
-                    DataBaseConstants.CreateCategory,
+                    DataBaseConstants.UpdateCategory,
                     new
                     {
                         category.CategoryName
@@ -56,7 +56,7 @@ namespace DataBase.DataControllers
             }
         }
 
-        public bool DeleteCategory(Categories category)
+        public bool DeleteCategory(int categoryId)
         {
             using (var connection = DataBaseConstants.GetConnection())
             {
@@ -65,7 +65,7 @@ namespace DataBase.DataControllers
                     DataBaseConstants.DeleteCategory,
                     new
                     {
-                        category.CategoryName
+                        CategoryID = categoryId
                     },
                     commandType: CommandType.StoredProcedure);
                 return rows > 0;
