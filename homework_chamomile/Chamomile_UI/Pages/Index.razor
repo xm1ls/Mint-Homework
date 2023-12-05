@@ -1,0 +1,178 @@
+﻿@page "/"
+@inject HttpClient Http
+@inject ChoosedTableState TableState
+@implements IDisposable
+@using Chamomile_Models.DataBaseModels
+
+<PageTitle>Home</PageTitle>
+
+<div class="page">
+    <div class="page__container">
+
+        @if(LoadingState is not null)
+        {
+            <div class="loading">
+                <div class="loading__container">
+                    @if (LoadingState is "Loading Tables" || LoadingState is "Loading Columns")
+                    {
+                       <div class="loading__animation"></div>                    
+                    }
+                    <div class="loading__text">@LoadingState</div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="tables__container">
+                <div class="tables__list">
+                    @foreach(var table in tableColumns)
+                    {
+                        <div class="tables__item">
+                            <div class="item__link">
+                                <NavLink class="item__table" href="@table.Key.name.ToLower()">
+                                    <button class="item__text" type="button" @onclick="@(() => TableState.ChooseTable(table.Key.name))">
+                                        @table.Key.name
+                                    </button>
+                                </NavLink>
+                                <div class="item__icon--open" @onclick="() => OnOpenTableDescription(table.Key)">
+                                    <svg class="expand-more-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                        <use xlink:href="./images/icons.svg#expand-more_icon"></use>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="@DescriptionColapseClass(table.Key) item__description">
+                                @foreach(var item in tableColumns)
+                                {
+                                    if(item.Key.name == table.Key.name)
+                                    {
+                                        @foreach(var column in item.Value)
+                                        {
+                                            <div class="description__column">
+                                                <div class="column__name">@column.COLUMN_NAME</div>
+                                                <div class="column__data-type">@column.DATA_TYPE</div>
+                                            </div>
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code
+{
+    private IEnumerable<Table>? tables;
+    private IEnumerable<Column>? columns;
+
+    private IDictionary<Table, IEnumerable<Column>>? tableColumns = new Dictionary<Table, IEnumerable<Column>>();
+
+    private string? LoadingState = "";
+    private List<Table> OpenedTables = new List<Table>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        TableState.TableChoosed += StateHasChanged;
+        TableState.ChooseTable(null);
+
+        await GetAllTables();
+        await GetAllColumns(tables);
+    }
+
+    public void Dispose()
+    {
+        TableState.TableChoosed -= StateHasChanged;
+    }
+
+    private async Task GetAllTables()
+    {
+        try
+        {
+            LoadingState = "Loading Tables";
+            tables = await Http.GetFromJsonAsync<IEnumerable<Table>>("api/DataBase/GetAllTables");
+
+            if (tables is null)
+                LoadingState = "DataBase Has No Tables";
+        }
+        catch (HttpRequestException ex)
+        {
+            LoadingState = "Failed To Fetch Tables";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            LoadingState = "Something Went Wrong";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task GetAllColumns(IEnumerable<Table> tables)
+    {
+        foreach (var table in tables)
+        {
+            try
+            {
+                LoadingState = "Loading Columns";
+                columns = await Http.GetFromJsonAsync<IEnumerable<Column>>($"api/DataBase/GetAllColumnsByTableName?tableName={table.name}");
+
+                if (columns is not null)
+                    tableColumns?.Add(table, columns);
+                else
+                {
+                    IEnumerable<Column> emptyColumn = new List<Column>
+                    {
+                        new Column
+                        {
+                            COLUMN_NAME = "Column Is Empty",
+                            DATA_TYPE = "Not Defined"
+                        }
+                    };
+
+                    tableColumns?.Add(table, emptyColumn);
+                }           
+
+            }
+            catch (HttpRequestException ex)
+            {
+                LoadingState = "Failed To Fetch Columns";
+                Console.WriteLine(LoadingState + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                LoadingState = "Something Went Wrong";
+                Console.WriteLine(LoadingState + ex.Message);
+            }
+            finally
+            {
+                StateHasChanged();
+            }
+        }
+
+        if (LoadingState is "Loading Columns")
+        {
+            LoadingState = null;
+            StateHasChanged();
+        }
+    }
+
+    private void OnOpenTableDescription(Table table)
+    {        
+        if (IsOpened(table))
+            OpenedTables.Remove(table);
+        else
+            OpenedTables.Add(table);
+    }
+
+    private bool IsOpened(Table table)
+        => OpenedTables.Any(item => item == table);
+
+    private string? DescriptionColapseClass(Table table)
+        => IsOpened(table) ? null : "collapseTableDescription" ;
+}

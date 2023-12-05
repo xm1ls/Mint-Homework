@@ -1,0 +1,32 @@
+﻿@inject HttpClient Http
+@using Chamomile_Models.DataBaseModels
+
+<div class="tables__list">
+    @if(tables is not null)
+    {
+        @foreach(var table in tables)
+        {
+            <NavLink href="@table.name.ToLower()">
+                <button class="table__item" type="button" @onclick="TableOnClick">@table.name</button>
+            </NavLink>
+        }
+    } 
+    else 
+    {
+        <p class="table__text--loading">Loading Tables...</p>
+    }
+</div>
+
+@code {
+    private IEnumerable<Table>? tables;
+
+    protected override async Task OnInitializedAsync()
+    {
+        tables = await Http.GetFromJsonAsync<IEnumerable<Chamomile_Models.DataBaseModels.Table>>("Table/GetAllTables");
+    }
+
+    private void TableOnClick()
+    {
+        
+    }
+}

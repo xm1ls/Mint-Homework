@@ -1,0 +1,199 @@
+﻿@page "/brands"
+@inject HttpClient Http
+@inject ChoosedTableState TableState
+@implements IDisposable
+@using Chamomile_Models.TableModels
+@using Chamomile_Models.DataBaseModels
+
+<PageTitle>Brands</PageTitle>
+
+<div class="page">
+    <div class="page__container">
+
+        @if (LoadingState is not null)
+        {
+            <div class="loading">
+                <div class="loading__container">
+                    @if (LoadingState is "Loading Brands" || 
+                         LoadingState is "Loading Columns" || 
+                         LoadingState is "Deleting Brand")
+                    {
+                        <div class="loading__animation"></div>
+                    }
+                    <div class="loading__text">@LoadingState</div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="page__table">
+                <table class="table">
+                    <tr class="table__row--header">
+                        @foreach(var column in columns)
+                        {
+                            <th class="table__header">@column.COLUMN_NAME</th>
+                        }
+                    </tr>
+                    @foreach(var brand in brands)
+                    {
+                        <tr class="@HoverItem(brand) table__row" @onclick="@(() => SelectItem(brand))">
+                            <td class="table__data">@brand.BrandId</td>
+                            <td class="table__data">@brand.BrandName</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            @if(SelectedItemInfo is not null)
+            {
+                <div class="page__actions">
+                    <div class="action--close" @onclick="@(() => { SelectedItemInfo = null; SelectedItems.Clear(); })">
+                        <svg class="close-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <use xlink:href="./images/icons.svg#close_icon"></use>
+                        </svg>
+                    </div>
+                    <div class="actions__info">
+                            @SelectedItemInfo
+                    </div>
+                    <div class="actions__container">
+                        <div class="action--edit">
+                            <svg class="edit-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <use xlink:href="./images/icons.svg#edit_icon"></use>
+                            </svg>
+                        </div>
+                        <div class="action--delete" @onclick="@(() => DeleteBrandById(SelectedItemInfo))">
+                            <svg class="delete-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                <use xlink:href="./images/icons.svg#delete_icon"></use>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private IEnumerable<Column>? columns;
+    private IEnumerable<Brand>? brands;
+
+    private List<Brand> SelectedItems = new List<Brand>();
+
+    private string? LoadingState = "";
+    private string? SelectedItemInfo = null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        TableState.ChooseTable("Brands");
+        TableState.TableChoosed += StateHasChanged;
+
+        await GetAllColumns();
+        await GetAllBrands();
+    }
+
+    public void Dispose()
+    {
+        TableState.TableChoosed -= StateHasChanged;
+    }
+
+    private async Task DeleteBrandById(string brandId)
+    {
+        try
+        {
+            LoadingState = "Deleting Brand";
+            brands = await Http.DeleteFromJsonAsync<IEnumerable<Brand>>($"api/Brand/DeleteBrand?brandId={brandId}");
+
+            if (brands is not null)
+            {
+                SelectedItems.Clear();
+                SelectedItemInfo = null;
+                LoadingState = null;
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            LoadingState = "Failed To Delete Brand";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            LoadingState = "Something Went Wrong";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private void OnItemSelect(Brand brand)
+    {
+        SelectedItems.Clear();
+        SelectedItems.Add(brand);
+    }
+
+    private bool IsSelected(Brand brand)
+        => SelectedItems.Any(item => item == brand);
+
+    private string? HoverItem(Brand brand)
+        => IsSelected(brand) ? "SelectItem" : null;
+
+    private void SelectItem(Brand brand)
+    {
+        OnItemSelect(brand);
+
+        SelectedItemInfo = brand.BrandId.ToString();
+        StateHasChanged();
+    }
+
+    private async Task GetAllBrands()
+    {
+        try
+        {
+            LoadingState = "Loading Brands";
+            StateHasChanged();
+
+            brands = await Http.GetFromJsonAsync<IEnumerable<Chamomile_Models.TableModels.Brand>>("api/Brand/GetAllBrands");
+        }
+        catch (HttpRequestException ex)
+        {
+            LoadingState = "Failed To Fetch Brands";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            LoadingState = "Something Went Wrong";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        finally
+        {
+            if (LoadingState is "Loading Brands")
+            {
+                LoadingState = null;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task GetAllColumns()
+    {
+        try
+        {
+            LoadingState = "Loading Columns";
+            columns = await Http.GetFromJsonAsync<IEnumerable<Column>>($"api/DataBase/GetAllColumnsByTableName?tableName=Brands");
+        }
+        catch (HttpRequestException ex)
+        {
+            LoadingState = "Failed To Fetch Columns";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            LoadingState = "Something Went Wrong";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+}

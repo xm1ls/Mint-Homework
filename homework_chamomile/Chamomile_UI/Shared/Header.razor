@@ -1,0 +1,85 @@
+﻿@inject ChoosedTableState TableState
+@inject NavigationManager NavigationManager
+@implements IDisposable
+
+<div class="header">
+    <div class="header__container">
+        <div class="burger__container">
+            <NavLink href="https://localhost:7007/">
+                <button class="header__burger" @onclick="@(() => TableState.ChooseTable(null))">
+                    <svg class="menu-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <use xlink:href="./images/icons.svg#home_icon"></use>
+                    </svg> 
+                </button>
+            </NavLink>
+        </div>
+        @if(TableState.TableName is not null)
+        {
+            @*<div class="search__container">
+                <div class="header__search">
+                    <select class="search__filter">
+                        <option hidden selected></option>
+                         @foreach (var option in Enum.GetValues(typeof(FilterOptions)))
+                        {
+                            <option value="@option">@option</option>
+                        }
+                        </select>
+                    <input class="search__input" type="text" placeholder="Search" />
+                    <div class="search__button">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <use xlink:href="./images/icons.svg#search_icon"></use>
+                        </svg>
+                    </div>
+                </div>
+            </div>*@
+            <div class="table__container">
+                <div class="header__table">
+                    <div class="table__text">@TableState.TableName</div>
+                </div>
+            </div>
+            <div class="actions__container">
+                <div class="header__actions">
+                    <div class="action--create">
+                        <svg class="plus-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <use xlink:href="./images/icons.svg#add_icon"></use>
+                        </svg>
+                    </div>
+                    @*<div class="action--update">
+                        <svg class="update-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <use xlink:href="./images/icons.svg#edit_icon"></use>
+                        </svg>
+                    </div>
+                    <div class="action--delete">
+                        <svg class="delete-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <use xlink:href="./images/icons.svg#delete_icon"></use>
+                        </svg>
+                    </div>*@
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    public string? tableName = "";
+
+    bool ShowHeaderActions = false;
+
+    private enum FilterOptions {
+        Id,
+        Name,
+    }
+
+    private FilterOptions filterOption = FilterOptions.Id;
+
+    protected override void OnInitialized()
+    {
+        TableState.TableChoosed += StateHasChanged;
+
+    }
+
+    public void Dispose()
+    {
+        TableState.TableChoosed -= StateHasChanged;
+    }
+}

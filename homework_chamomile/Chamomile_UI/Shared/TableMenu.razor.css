@@ -1,0 +1,26 @@
+﻿
+
+.tables__list {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.table__item {
+    font-size: 18px;
+    color: black;
+    background-color: white;
+    padding: 5px 15px;
+    border: 1px solid black;
+    cursor: pointer;
+    transition-property: color, background-color, border-radius;
+    transition-duration: .3s;
+    transition-timing-function: ease-in-out;
+}
+
+.table__item:focus,
+.table__item:hover {
+    color: white;
+    background-color: black;
+    border-radius: 0px 15px 0px 15px;
+}

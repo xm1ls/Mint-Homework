@@ -1,0 +1,216 @@
+﻿.page {
+    padding: 0px 15px;
+    
+}
+
+.page__container {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px;
+    margin: 0 auto;
+    max-width: 1920px;
+}
+
+.tables__container {
+    display: flex;
+    padding: 0px;
+    margin: 0 auto;
+    max-width: 1920px;
+}
+
+.tables__list {
+    display: grid;
+    grid-template-columns: repeat(4, 300px);
+    grid-gap: 15px;
+    padding: 15px;
+}
+
+.tables__item {
+    height: fit-content;
+    transition-property: opacity, visibility;
+    transition-duration: .3s;
+    transition-timing-function: ease-in-out;
+}
+
+.collapseTableDescription {
+    visibility: hidden;
+    opacity: 0;
+}
+
+.item__link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 5px;
+    padding: 15px 20px;
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+}
+
+.item__table {
+
+}
+
+.item__text {
+    display: inline-block;
+    text-align: start;
+    padding: 10px 10px 10px 0;
+    text-decoration: none;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition-property: all;
+    transition-duration: .3s;
+    transition-timing-function: ease-in-out;
+}
+
+.item__text::after {
+  content: '';
+  width: 0px;
+  height: 1px;
+  display: block;
+  background: black;
+  transition: .3s;
+}
+
+.item__text:hover::after {
+  width: 100%;
+}
+
+.item__icon--open {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 39px;
+    height: 39px;
+    cursor: pointer;
+    border-radius: 17%;
+    background-color: white;
+    transition-property: color, background-color;
+    transition-duration: .3s;
+    transition-timing-function: ease-in-out;
+}
+
+.item__icon--open:hover {
+    color: white;
+    background-color: black;
+}
+
+.item__description {
+    display: flex;
+    flex-direction: column;
+    align-self: flex-end;
+    padding: 15px 20px;
+    background-color: black;
+    transition: all .3s ease-in-out;
+}
+
+.description__column {
+    display: flex;
+    justify-content: space-between;
+    color: white;
+}
+
+.column__name {
+
+}
+
+.column__data-type {
+
+}
+
+
+
+.loading {
+    margin: 0 auto;
+    padding: 30px;
+}
+
+.loading__container {
+    top: 50%;
+    left: 50%;
+    width: 30em;
+    height: 18em;
+    margin-top: -9em;
+    margin-left: -15em;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading__text {
+    font-size: 18px;
+    color: black;
+}
+
+.loading__animation {
+    position: relative;
+    top: 8px;
+    left: -9999px;
+    width: 10px;
+    height: 10px;
+    border-radius: 5px;
+    background-color: black;
+    color: black;
+    box-shadow: 9991px -16px 0 0 black, 9991px 0 0 0 black, 10007px 0 0 0 black;
+    animation: loading__animation 2s infinite ease;
+}
+
+@keyframes loading__animation {
+    0% {
+        box-shadow: 9991px -16px 0 0 black, 9991px 0 0 0 black, 10007px 0 0 0 black;
+    }
+
+    8.333% {
+        box-shadow: 10007px -16px 0 0 black, 9991px 0 0 0 black, 10007px 0 0 0 black;
+    }
+
+    16.667% {
+        box-shadow: 10007px -16px 0 0 black, 9991px -16px 0 0 black, 10007px 0 0 0 black;
+    }
+
+    25% {
+        box-shadow: 10007px -16px 0 0 black, 9991px -16px 0 0 black, 9991px 0 0 0 black;
+    }
+
+    33.333% {
+        box-shadow: 10007px 0 0 0 black, 9991px -16px 0 0 black, 9991px 0 0 0 black;
+    }
+
+    41.667% {
+        box-shadow: 10007px 0 0 0 black, 10007px -16px 0 0 black, 9991px 0 0 0 black;
+    }
+
+    50% {
+        box-shadow: 10007px 0 0 0 black, 10007px -16px 0 0 black, 9991px -16px 0 0 black;
+    }
+
+    58.333% {
+        box-shadow: 9991px 0 0 0 black, 10007px -16px 0 0 black, 9991px -16px 0 0 black;
+    }
+
+    66.666% {
+        box-shadow: 9991px 0 0 0 black, 10007px 0 0 0 black, 9991px -16px 0 0 black;
+    }
+
+    75% {
+        box-shadow: 9991px 0 0 0 black, 10007px 0 0 0 black, 10007px -16px 0 0 black;
+    }
+
+    83.333% {
+        box-shadow: 9991px -16px 0 0 black, 10007px 0 0 0 black, 10007px -16px 0 0 black;
+    }
+
+    91.667% {
+        box-shadow: 9991px -16px 0 0 black, 9991px 0 0 0 black, 10007px -16px 0 0 black;
+    }
+
+    100% {
+        box-shadow: 9991px -16px 0 0 black, 9991px 0 0 0 black, 10007px 0 0 0 black;
+    }
+}

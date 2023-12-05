@@ -1,0 +1,134 @@
+﻿.header {
+    padding: 0px 15px;
+    border-bottom: 1px solid black;
+}
+
+.header__container {
+    display: flex;
+    justify-content: space-between;
+    padding: 0px;
+    margin: 0 auto;
+    max-width: 1920px;
+}
+
+.burger__container {
+    display: flex;
+    align-items: center;
+    padding: 15px 30px;
+    border-right: 1px solid black;
+}
+
+.header__burger {
+    border: none;
+    outline: none;
+    text-decoration: none;
+    color: black;
+}
+
+.actions__container {
+    display: flex;
+    align-items: center;
+    padding: 15px 30px;
+    border-left: 1px solid black;
+}
+
+.search__container {
+    display: flex;
+    align-items: center;
+    padding: 15px 30px;
+    margin-right: auto;
+    border-right: 1px solid black;
+}
+
+.table__container {
+    display: flex;
+    align-items: center;
+    padding: 15px 30px;
+    margin-right: auto;
+}
+
+.header__table {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.table__text {
+    font-size: 20px;
+}
+
+.search__input {
+    height: 39px;
+    width: 250px;
+    border: none;
+    outline: none;
+    font-size: 14px;
+}
+
+.search__input::placeholder {
+    color: black;
+}
+
+.header__search {
+    display: flex;
+    gap: 5px;
+    justify-content: space-between;
+    align-items: center;
+    
+}
+
+.search__filter {
+    width: 39px;
+    height: 39px;
+    border-radius: 17%;
+    color: black;
+    border-color: black;
+    position: relative;
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    appearance: none;
+    border: none;
+    outline: none;
+    background: white url("data:image/svg+xml;utf8,<svg viewBox='0 0 32 32' width='20' height='20' xmlns='http://www.w3.org/2000/svg'><g><path d='M13.333 24v-2.667h5.333v2.667h-5.333zM8 17.333v-2.667h16v2.667h-16zM4 10.667v-2.667h24v2.667h-24z' fill='black'/></g></svg>") no-repeat;
+    background-position: right 50% top 50%;
+    cursor: pointer;
+    transition-property: background;
+    transition-duration: .3s;
+    transition-timing-function: ease-in-out;
+}
+
+.header__actions {
+    display: flex;
+    gap: 15px;
+}
+
+.header__burger,
+.search__button,
+.header__actions div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 39px;
+    height: 39px;
+    cursor: pointer;
+    border-radius: 17%;
+    background-color: white;
+    transition-property: color, background-color;
+    transition-duration: .3s;
+    transition-timing-function: ease-in-out;
+}
+
+.header__burger:hover,
+.search__button:hover,
+.header__actions div:hover {
+    color: white;
+    background-color: black;
+}
+
+.search__filter:hover {
+    border: none;
+    outline: none;
+    color: white;
+    background: black url("data:image/svg+xml;utf8,<svg viewBox='0 0 32 32' width='20' height='20' xmlns='http://www.w3.org/2000/svg'><g><path d='M13.333 24v-2.667h5.333v2.667h-5.333zM8 17.333v-2.667h16v2.667h-16zM4 10.667v-2.667h24v2.667h-24z' fill='white'/></g></svg>") no-repeat;
+    background-position: right 50% top 50%;
+}

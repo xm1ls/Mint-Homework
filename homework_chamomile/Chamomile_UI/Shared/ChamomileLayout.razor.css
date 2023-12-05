@@ -1,0 +1,17 @@
+﻿.page {
+    margin: 0;
+    padding: 0;
+    background-color: white;
+}
+
+.page__container {
+    margin: 0 auto;
+    max-width: 1920px;
+    height: 100%;
+    background-color: white;
+
+}
+
+.tables {
+    margin: 0 auto;
+}
