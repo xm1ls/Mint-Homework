@@ -1,5 +1,6 @@
 ﻿@inject ChoosedTableState TableState
 @inject NavigationManager NavigationManager
+@inject AddBrandState AddBrandState
 @implements IDisposable
 
 <div class="header">
@@ -15,7 +16,7 @@
         </div>
         @if(TableState.TableName is not null)
         {
-            @*<div class="search__container">
+            <div class="search__container">
                 <div class="header__search">
                     <select class="search__filter">
                         <option hidden selected></option>
@@ -23,7 +24,7 @@
                         {
                             <option value="@option">@option</option>
                         }
-                        </select>
+                    </select>
                     <input class="search__input" type="text" placeholder="Search" />
                     <div class="search__button">
                         <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -31,7 +32,7 @@
                         </svg>
                     </div>
                 </div>
-            </div>*@
+            </div>
             <div class="table__container">
                 <div class="header__table">
                     <div class="table__text">@TableState.TableName</div>
@@ -39,7 +40,7 @@
             </div>
             <div class="actions__container">
                 <div class="header__actions">
-                    <div class="action--create">
+                    <div class="action--create" @onclick="@(() => AddBrandState.AddBrand(true))">
                         <svg class="plus-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <use xlink:href="./images/icons.svg#add_icon"></use>
                         </svg>

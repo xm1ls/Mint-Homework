@@ -15,6 +15,7 @@ namespace Chamomile_UI
 
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri("https://localhost:7056/") });
             builder.Services.AddScoped<ChoosedTableState>();
+            builder.Services.AddScoped<AddBrandState>();
 
             await builder.Build().RunAsync();
         }

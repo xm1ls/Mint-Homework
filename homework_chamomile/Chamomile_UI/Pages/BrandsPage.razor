@@ -1,9 +1,11 @@
 ﻿@page "/brands"
 @inject HttpClient Http
 @inject ChoosedTableState TableState
+@inject AddBrandState AddBrandState
 @implements IDisposable
 @using Chamomile_Models.TableModels
 @using Chamomile_Models.DataBaseModels
+@using Chamomile_UI.Utils
 
 <PageTitle>Brands</PageTitle>
 
@@ -21,6 +23,40 @@
                         <div class="loading__animation"></div>
                     }
                     <div class="loading__text">@LoadingState</div>
+                </div>
+            </div>
+        }
+        else if (AddBrandState.IsAddBrand)
+        {
+            <div class="page__add-item">
+                <div class="add-item__container">
+                    <div class="add-item__title">
+                        Create Brand
+                    </div>
+                    @foreach (var column in columns)
+                    {
+                        <div class="add-item__column">
+                            @if (column.COLUMN_NAME is "BrandName")
+                            {
+                                <label class="add-item__label" for="@column.COLUMN_NAME">@column.COLUMN_NAME</label>
+                                <input name="@column.COLUMN_NAME" class="add-item__input" placeholder="Type In..." @bind-value="BrandName" />
+                            }
+                        </div>
+                    }
+                </div>
+                <div class="add-item__actions">
+                    <div class="add-item__action--cancel" @onclick="@(() => AddBrandState.AddBrand(false))">
+                        Cancel
+                        <svg class="close-icon--add-item" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <use xlink:href="./images/icons.svg#close_icon"></use>
+                        </svg>
+                    </div>
+                    <div class="add-item__action--confirm" @onclick="@(() => { if(BrandName is not null) CreateBrand(); })">
+                        Confirm
+                        <svg class="accept-icon--add-item" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <use xlink:href="./images/icons.svg#check_icon"></use>
+                        </svg>
+                    </div>
                 </div>
             </div>
         }
@@ -46,26 +82,75 @@
             @if(SelectedItemInfo is not null)
             {
                 <div class="page__actions">
-                    <div class="action--close" @onclick="@(() => { SelectedItemInfo = null; SelectedItems.Clear(); })">
+                    <div class="action--close" @onclick="@(() => { SelectedItemInfo = null; SelectedItems.Clear(); ModalUpdate = false; })">
                         <svg class="close-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
                             <use xlink:href="./images/icons.svg#close_icon"></use>
                         </svg>
                     </div>
                     <div class="actions__info">
-                            @SelectedItemInfo
+                        @SelectedItemInfo
                     </div>
                     <div class="actions__container">
-                        <div class="action--edit">
+                        <div class="action--edit" @onclick="@(() => { ModalUpdate = !ModalUpdate; ModalDelete = false; })">
                             <svg class="edit-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
                                 <use xlink:href="./images/icons.svg#edit_icon"></use>
                             </svg>
                         </div>
-                        <div class="action--delete" @onclick="@(() => DeleteBrandById(SelectedItemInfo))">
+                        <div class="action--delete" @onclick="@(() => { ModalDelete = !ModalDelete; ModalUpdate = false; })">
                             <svg class="delete-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
                                 <use xlink:href="./images/icons.svg#delete_icon"></use>
                             </svg>
                         </div>
                     </div>
+                </div>
+                @if(ModalDelete)
+                {
+                    <div class="page__modal--delete">
+                        <div class="modal__container--delete">
+                            <div class="modal__action--cancel" @onclick="@(() => ModalDelete = !ModalDelete)">
+                                Cancel
+                                <svg class="close-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <use xlink:href="./images/icons.svg#close_icon"></use>
+                                </svg>
+                            </div>
+                            <div class="modal__action--confirm" @onclick="@(() => DeleteBrandById(SelectedItemInfo))">
+                                Confirm
+                                <svg class="accept-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                                    <use xlink:href="./images/icons.svg#check_icon"></use>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="modal__pointer--delete"></div>
+                    </div>
+                }
+            }
+            @if(ModalUpdate)
+            {
+                <div class="page__modal--update">
+                    <div class="modal__container">
+                        @foreach (var column in columns)
+                        {
+                            <div class="modal__column">
+                                <label class="modal__label" for="@column.COLUMN_NAME">@column.COLUMN_NAME</label>
+
+                                @if (column.COLUMN_NAME is "BrandId")
+                                {
+                                    <input name="@column.COLUMN_NAME" class="modal__input" placeholder="@SelectedItemInfo" disabled/>
+                                }
+                                else
+                                {
+                                    <input name="@column.COLUMN_NAME" class="modal__input" placeholder="Type In..." @bind-value="BrandName" />
+                                }
+                            </div>
+                        }
+                    </div>
+                    <div class="modal__action--accept" @onclick="@(() => { if(BrandName is not null) UpdateBrandById(SelectedItemInfo); })">
+                        Confirm
+                        <svg class="accept-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                            <use xlink:href="./images/icons.svg#check_icon"></use>
+                        </svg>
+                    </div>
+                    <div class="modal__pointer"></div>
                 </div>
             }
         }
@@ -76,6 +161,11 @@
     private IEnumerable<Column>? columns;
     private IEnumerable<Brand>? brands;
 
+    private string? BrandName = null;
+
+    private bool ModalDelete = false;
+    private bool ModalUpdate = false;
+
     private List<Brand> SelectedItems = new List<Brand>();
 
     private string? LoadingState = "";
@@ -85,6 +175,7 @@
     {
         TableState.ChooseTable("Brands");
         TableState.TableChoosed += StateHasChanged;
+        AddBrandState.BrandAdded += StateHasChanged;
 
         await GetAllColumns();
         await GetAllBrands();
@@ -93,6 +184,100 @@
     public void Dispose()
     {
         TableState.TableChoosed -= StateHasChanged;
+        AddBrandState.BrandAdded -= StateHasChanged;
+    }
+
+    private async Task CreateBrand()
+    {
+        try
+        {
+            LoadingState = "Creating Brand";
+
+            var brand = new Brand()
+                {
+                    BrandId = 0,
+                    BrandName = BrandName
+                };
+
+            var response = await Http.PostAsJsonAsync($"api/Brand/CreateBrand", brand);
+
+            if (response.IsSuccessStatusCode)
+            {
+                brands = await Utilities.DeserializeBrandsAsync(response.Content);
+
+                if (brands is not null)
+                {
+                    AddBrandState.AddBrand(false);
+                    BrandName = null;
+                    ModalUpdate = false;
+                    SelectedItems.Clear();
+                    SelectedItemInfo = null;
+                    LoadingState = null;
+
+                    await GetAllBrands();
+                }
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            LoadingState = "Failed To Create Brand";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            LoadingState = "Something Went Wrong";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
+    }
+
+    private async Task UpdateBrandById(string brandId)
+    {
+        try
+        {
+            LoadingState = "Updating Brand";
+
+            var brand = new Brand()
+                {
+                    BrandId = int.Parse(brandId),
+                    BrandName = BrandName
+                };
+
+            var response = await Http.PutAsJsonAsync($"api/Brand/UpdateBrand", brand);
+
+            if (response.IsSuccessStatusCode)
+            {
+                brands = await Utilities.DeserializeBrandsAsync(response.Content);
+
+                if (brands is not null)
+                {
+                    BrandName = null;
+                    ModalUpdate = false;
+                    SelectedItems.Clear();
+                    SelectedItemInfo = null;
+                    LoadingState = null;
+
+                    await GetAllBrands();
+                }
+            }
+        }
+        catch (HttpRequestException ex)
+        {
+            LoadingState = "Failed To Update Brand";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        catch (Exception ex)
+        {
+            LoadingState = "Something Went Wrong";
+            Console.WriteLine(LoadingState + ex.Message);
+        }
+        finally
+        {
+            StateHasChanged();
+        }
     }
 
     private async Task DeleteBrandById(string brandId)
